@@ -1,0 +1,15 @@
+{
+    "metadata": {
+        "name": "Welcome"
+    },
+    "cells": [
+        {
+            "type": "markdown",
+            "content": "# \ud83d\ude80 Welcome to Faraz ye Man Notebook"
+        },
+        {
+            "type": "code",
+            "content": "print(\"Hello, Immortal World!\")"
+        }
+    ]
+}

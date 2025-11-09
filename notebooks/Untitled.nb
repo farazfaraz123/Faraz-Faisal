@@ -1,0 +1,12 @@
+{
+  "cells": [
+    {
+      "type": "code",
+      "content": "clear"
+    }
+  ],
+  "metadata": {
+    "name": "Untitled",
+    "modified": 1762674384341
+  }
+}

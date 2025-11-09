@@ -1,0 +1,12 @@
+{
+  "cells": [
+    {
+      "type": "code",
+      "content": ""
+    }
+  ],
+  "metadata": {
+    "name": "faraz",
+    "modified": 1762540592477
+  }
+}

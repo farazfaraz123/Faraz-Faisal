@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The most powerful, beautiful, and feature-rich notebook interface ever created">
+    <meta name="keywords" content="jupyter, notebook, python, code editor, monaco, immortal">
+    <meta name="author" content="Dark One Mood">
+    <meta name="theme-color" content="#6366f1">
+    <title>🚀 Faraz ye Man - Ultimate Immortal Notebook</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Highlight.js for Syntax Highlighting in Markdown -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for Stats -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+
+    <!-- Particles.js for Background -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        /* Critical CSS for instant loading */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .loading-screen { position: fixed; inset: 0; z-index: 10000; }
+    </style>
+</head>
+<body data-theme="dark" data-mode="normal">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-background">
+            <div class="loading-particles"></div>
+            <div class="loading-grid"></div>
+        </div>
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="loading-logo-ring"></div>
+                <div class="loading-logo-ring"></div>
+                <div class="loading-logo-ring"></div>
+                <span class="loading-logo-text">🚀</span>
+            </div>
+            <h1 class="loading-title">
+                <span class="loading-title-word">Faraz</span>
+                <span class="loading-title-word">ye</span>
+                <span class="loading-title-word">Man</span>
+            </h1>
+            <p class="loading-subtitle">Ultimate Immortal Notebook</p>
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar" id="loading-progress"></div>
+            </div>
+            <p class="loading-status" id="loading-status">Initializing systems...</p>
+            <div class="loading-stats">
+                <span class="loading-stat"><i class="fas fa-code"></i> Monaco Editor</span>
+                <span class="loading-stat"><i class="fas fa-bolt"></i> Python Kernel</span>
+                <span class="loading-stat"><i class="fas fa-brain"></i> AI Assistant</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particles Background -->
+    <div id="particles-js" class="particles-background"></div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container hidden">
+
+        <!-- Toolbar -->
+        <div id="toolbar" class="toolbar">
+            <div class="toolbar-section toolbar-left">
+                <div class="app-brand">
+                    <div class="app-logo">🚀</div>
+                    <div class="app-info">
+                        <h1 class="app-title">Faraz ye Man</h1>
+                        <span class="app-version">v3.0.0 Ultimate</span>
+                    </div>
+                </div>
+                <div class="notebook-info">
+                    <i class="fas fa-book"></i>
+                    <span class="notebook-name" id="notebook-name">Untitled</span>
+                    <span class="notebook-status" id="notebook-status">
+                        <i class="fas fa-circle"></i> Ready
+                    </span>
+                </div>
+            </div>
+
+            <div class="toolbar-section toolbar-center">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="add-code-btn" title="Add Code Cell">
+                        <i class="fas fa-code"></i><span class="btn-text">Code</span>
+                    </button>
+                    <button class="btn btn-secondary" id="add-markdown-btn" title="Add Markdown Cell">
+                        <i class="fas fa-file-alt"></i><span class="btn-text">Markdown</span>
+                    </button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="run-all-btn" title="Run All Cells">
+                        <i class="fas fa-play"></i><span class="btn-text">Run All</span>
+                    </button>
+                    <button class="btn btn-danger" id="reset-kernel-btn" title="Reset Kernel">
+                        <i class="fas fa-sync-alt"></i><span class="btn-text">Reset</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-section toolbar-right">
+                <div class="btn-group">
+                    <button class="btn btn-icon" id="save-btn" title="Save"><i class="fas fa-save"></i></button>
+                    <button class="btn btn-icon" id="load-btn" title="Load"><i class="fas fa-folder-open"></i></button>
+                    <button class="btn btn-icon" id="search-btn" title="Search"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-icon toggle-btn" id="theme-btn" title="Theme"><i class="fas fa-palette"></i></button>
+                    <button class="btn btn-icon toggle-btn" id="dnd-mode-btn" title="DND Mode"><i class="fas fa-moon"></i></button>
+                    <button class="btn btn-icon toggle-btn" id="hacker-mode-btn" title="Hacker Mode"><i class="fas fa-user-secret"></i></button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-icon" id="stats-btn" title="Stats"><i class="fas fa-chart-bar"></i></button>
+                    <button class="btn btn-icon" id="ai-assistant-btn" title="AI"><i class="fas fa-brain"></i></button>
+                    <button class="btn btn-icon" id="quiz-btn" title="Quiz"><i class="fas fa-gamepad"></i></button>
+                    <button class="btn btn-icon" id="settings-btn" title="Settings"><i class="fas fa-cog"></i></button>
+                    <button class="btn btn-icon" id="info-btn" title="Info"><i class="fas fa-info-circle"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Navigation</h3>
+                <button class="sidebar-close-btn" id="sidebar-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="outline"><i class="fas fa-list"></i> Outline</button>
+                <button class="sidebar-tab" data-tab="bookmarks"><i class="fas fa-bookmark"></i> Bookmarks</button>
+                <button class="sidebar-tab" data-tab="variables"><i class="fas fa-database"></i> Variables</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-panel active" id="outline-panel">
+                    <div class="outline-container" id="outline-container"><p class="empty-state">No cells yet</p></div>
+                </div>
+                <div class="sidebar-panel" id="bookmarks-panel">
+                    <div class="bookmarks-container" id="bookmarks-container"><p class="empty-state">No bookmarks yet</p></div>
+                </div>
+                <div class="sidebar-panel" id="variables-panel">
+                    <div class="variables-container" id="variables-container"><p class="empty-state">Run code to see variables</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <button class="sidebar-toggle-btn" id="sidebar-toggle-btn"><i class="fas fa-bars"></i></button>
+            <div id="notebook-container" class="notebook-container"></div>
+            <div class="add-cell-bottom">
+                <button class="btn btn-ghost" id="add-cell-bottom-btn"><i class="fas fa-plus"></i><span>Add Cell</span></button>
+            </div>
+        </div>
+
+        <!-- FAB Menu -->
+        <div class="fab-container">
+            <button class="fab" id="fab-main"><i class="fas fa-magic"></i></button>
+            <div class="fab-menu" id="fab-menu">
+                <button class="fab-item" id="fab-ai" title="AI Help"><i class="fas fa-robot"></i></button>
+                <button class="fab-item" id="fab-snippet" title="Snippets"><i class="fas fa-puzzle-piece"></i></button>
+                <button class="fab-item" id="fab-share" title="Share"><i class="fas fa-share-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- AI Panel -->
+        <div id="ai-panel" class="ai-panel">
+            <div class="ai-panel-header">
+                <div class="ai-avatar">🤖</div>
+                <div><h3>AI Assistant</h3><span class="ai-status">Online</span></div>
+                <button class="ai-panel-close" id="ai-panel-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="ai-chat-container" id="ai-chat-container">
+                <div class="ai-message ai-message-assistant">
+                    <div class="ai-message-avatar">🤖</div>
+                    <div class="ai-message-content"><p>Hello! I'm your AI assistant. How can I help?</p></div>
+                </div>
+            </div>
+            <div class="ai-input-container">
+                <textarea id="ai-input" placeholder="Ask me anything..." rows="2"></textarea>
+                <button class="ai-send-btn" id="ai-send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div id="stats-panel" class="stats-panel">
+            <div class="stats-panel-header">
+                <h3><i class="fas fa-chart-line"></i> Statistics</h3>
+                <button class="stats-panel-close" id="stats-panel-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="stats-content">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-code"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-cells">0</span>
+                        <span class="stat-label">Total Cells</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-code"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-code-cells">0</span>
+                        <span class="stat-label">Code Cells</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modals -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> About</h2>
+                <button class="modal-close" data-modal="info-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Faraz ye Man - Ultimate Immortal Notebook</strong></p>
+                <p>Creator: Dark One Mood</p>
+                <p>Email: darkonemood@gmail.com</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <button class="modal-close" data-modal="settings-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>Auto-save</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="setting-autosave">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Sound Effects</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="setting-sounds" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-gamepad"></i> Personality Quiz</h2>
+                <button class="modal-close" data-modal="quiz-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="quiz-question-container" class="quiz-question-container">
+                    <p id="quiz-question" class="quiz-question"></p>
+                    <div id="quiz-options" class="quiz-options"></div>
+                </div>
+                <div id="quiz-result-container" class="quiz-result-container hidden">
+                    <h3 id="quiz-result-title"></h3>
+                    <p id="quiz-result-description"></p>
+                    <button class="btn btn-primary" id="quiz-restart-btn">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="load-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-folder-open"></i> Load Notebook</h2>
+                <button class="modal-close" data-modal="load-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="notebook-list" class="notebook-list"><p class="loading-text">Loading...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="save-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-save"></i> Save Notebook</h2>
+                <button class="modal-close" data-modal="save-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="save-form">
+                    <label for="notebook-name-input">Notebook Name:</label>
+                    <input type="text" id="notebook-name-input" class="input-field" placeholder="My Notebook">
+                    <button class="btn btn-success" id="save-confirm-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="input-modal" class="modal modal-input">
+        <div class="modal-content modal-small">
+            <div class="modal-header"><h3 id="input-prompt">Input Required</h3></div>
+            <div class="modal-body">
+                <input type="text" id="input-field" class="input-field" placeholder="Type here...">
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="input-submit-btn">Submit</button>
+                    <button class="btn btn-secondary" id="input-cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Command Palette -->
+    <div id="command-palette" class="command-palette">
+        <div class="command-palette-content">
+            <div class="command-palette-search">
+                <i class="fas fa-terminal"></i>
+                <input type="text" id="command-input" placeholder="Type a command...">
+            </div>
+            <div class="command-palette-results" id="command-results"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Monaco Editor -->
+    <script>var require = { paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } };</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.js"></script>
+
+    <!-- Main Script -->
+    <script src="/static/js/main.js"></script>
+
+    <script>
+        // Loading animation
+        let loadProgress = 0;
+        const loadingBar = document.getElementById('loading-progress');
+        const loadingInterval = setInterval(() => {
+            loadProgress += Math.random() * 20;
+            if (loadProgress > 100) loadProgress = 100;
+            loadingBar.style.width = loadProgress + '%';
+            if (loadProgress >= 100) {
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('app-container').classList.remove('hidden');
+                }, 500);
+            }
+        }, 200);
+
+        // Console Easter Eggs
+        console.log('%c🚀 Faraz ye Man - Ultimate Notebook', 'font-size: 24px; font-weight: bold; color: #667eea;');
+        console.log('%cMade with ❤️ by Dark One Mood', 'font-size: 12px; color: #888;');
+    </script>
+
+</body>
+</html>

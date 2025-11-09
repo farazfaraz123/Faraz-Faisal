@@ -1,0 +1,15 @@
+{
+  "cells": [
+    {
+      "type": "markdown",
+      "content": "# \ud83d\ude80 Welcome to QuantumNotebook\n\nA next-generation Python notebook with cyberpunk aesthetics."
+    },
+    {
+      "type": "code",
+      "content": "print(\"Hello, Quantum World!\")\nfor i in range(5):\n    print(f\"\u2728 Iteration {i}\")"
+    }
+  ],
+  "metadata": {
+    "name": "Welcome"
+  }
+}
